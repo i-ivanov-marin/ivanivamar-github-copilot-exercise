@@ -1,4 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Escapes user-controlled strings before interpolating into innerHTML to prevent XSS
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    })[char]);
+  }
+
   const activitiesList = document.getElementById("activities-list");
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
@@ -27,12 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
               .map(
                 (participant) => `
                   <li class="participant-item">
-                    <span class="participant-email">${participant}</span>
+                    <span class="participant-email">${escapeHtml(participant)}</span>
                     <button
                       class="delete-participant"
-                      title="Unregister ${participant}"
-                      data-activity="${name}"
-                      data-email="${participant}"
+                      title="Unregister ${escapeHtml(participant)}"
+                      data-activity="${escapeHtml(name)}"
+                      data-email="${escapeHtml(participant)}"
                     >&#128465;</button>
                   </li>`
               )
@@ -40,9 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
           : '<li class="participant-item empty">No participants yet</li>';
 
         activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
+          <h4>${escapeHtml(name)}</h4>
+          <p>${escapeHtml(details.description)}</p>
+          <p><strong>Schedule:</strong> ${escapeHtml(details.schedule)}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
           <div class="participants-section">
             <p class="participants-title"><strong>Participants:</strong></p>
